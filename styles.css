@@ -29,7 +29,27 @@ h1 {
 .add-habit {
     display: flex;
     gap: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+}
+
+.habits-actions {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.remove-button {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.remove-button:hover {
+    background-color: #c0392b;
 }
 
 input[type="text"] {
@@ -78,6 +98,13 @@ button:hover {
     font-size: 18px;
     color: #2c3e50;
     font-weight: bold;
+}
+
+.habit-select {
+    width: 20px;
+    height: 20px;
+    margin-left: 15px;
+    cursor: pointer;
 }
 
 .week-grid {

@@ -31,7 +31,8 @@ function addHabit() {
             completedDays: {
                 [today]: {}
             },
-            date: today
+            date: today,
+            selected: false
         };
         
         habits.push(habit);
@@ -60,6 +61,25 @@ function toggleHabitDay(habitId, dayIndex) {
     }
 }
 
+// פונקציה לבחירת הרגל להסרה
+function toggleHabitSelection(habitId) {
+    const habit = habits.find(h => h.id === habitId);
+    if (habit) {
+        habit.selected = !habit.selected;
+        saveHabits();
+        renderHabits();
+    }
+}
+
+// פונקציה להסרת הרגלים נבחרים
+function removeSelectedHabits() {
+    if (confirm('האם אתה בטוח שברצונך להסיר את ההרגלים הנבחרים?')) {
+        habits = habits.filter(habit => !habit.selected);
+        saveHabits();
+        renderHabits();
+    }
+}
+
 // פונקציה להצגת הרגלים
 function renderHabits() {
     const habitsList = document.getElementById('habitsList');
@@ -72,10 +92,17 @@ function renderHabits() {
         const habitHeader = document.createElement('div');
         habitHeader.className = 'habit-header';
         
+        const selectCheckbox = document.createElement('input');
+        selectCheckbox.type = 'checkbox';
+        selectCheckbox.className = 'habit-select';
+        selectCheckbox.checked = habit.selected || false;
+        selectCheckbox.onclick = () => toggleHabitSelection(habit.id);
+        
         const text = document.createElement('span');
         text.className = 'habit-text';
         text.textContent = habit.text;
         
+        habitHeader.appendChild(selectCheckbox);
         habitHeader.appendChild(text);
         habitElement.appendChild(habitHeader);
         
