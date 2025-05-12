@@ -11,8 +11,8 @@
         <h1>מעקב הרגלים חדשים</h1>
         
         <div class="add-habit">
-            <input type="text" id="newHabit" placeholder="הכנס הרגל חדש...">
-            <button onclick="addHabit()">הוסף הרגל</button>
+            <input type="text" id="newHabit" placeholder="הכנס הרגל חדש..." onkeypress="if(event.key === 'Enter') addHabit()">
+            <button type="button" onclick="addHabit()">הוסף הרגל</button>
         </div>
 
         <div id="habitsList" class="habits-list">

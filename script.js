@@ -12,6 +12,9 @@ const encouragements = [
     "אתה בונה את העתיד שלך!"
 ];
 
+// שמות הימים בעברית
+const weekDays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+
 // טעינת הרגלים מהאחסון המקומי
 let habits = JSON.parse(localStorage.getItem('habits')) || [];
 
@@ -21,11 +24,14 @@ function addHabit() {
     const habitText = input.value.trim();
     
     if (habitText) {
+        const today = new Date().toLocaleDateString('he-IL');
         const habit = {
             id: Date.now(),
             text: habitText,
-            completed: false,
-            date: new Date().toLocaleDateString('he-IL')
+            completedDays: {
+                [today]: {}
+            },
+            date: today
         };
         
         habits.push(habit);
@@ -40,11 +46,15 @@ function saveHabits() {
     localStorage.setItem('habits', JSON.stringify(habits));
 }
 
-// פונקציה לעדכון סטטוס הרגל
-function toggleHabit(id) {
-    const habit = habits.find(h => h.id === id);
+// פונקציה לעדכון סטטוס הרגל ליום ספציפי
+function toggleHabitDay(habitId, dayIndex) {
+    const habit = habits.find(h => h.id === habitId);
     if (habit) {
-        habit.completed = !habit.completed;
+        const today = new Date().toLocaleDateString('he-IL');
+        if (!habit.completedDays[today]) {
+            habit.completedDays[today] = {};
+        }
+        habit.completedDays[today][dayIndex] = !habit.completedDays[today][dayIndex];
         saveHabits();
         renderHabits();
     }
@@ -57,22 +67,48 @@ function renderHabits() {
     
     habits.forEach(habit => {
         const habitElement = document.createElement('div');
-        habitElement.className = `habit-item ${habit.completed ? 'completed' : ''}`;
+        habitElement.className = 'habit-item';
         
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'habit-checkbox';
-        checkbox.checked = habit.completed;
-        checkbox.onclick = () => toggleHabit(habit.id);
+        const habitHeader = document.createElement('div');
+        habitHeader.className = 'habit-header';
         
         const text = document.createElement('span');
         text.className = 'habit-text';
         text.textContent = habit.text;
         
-        habitElement.appendChild(text);
-        habitElement.appendChild(checkbox);
+        habitHeader.appendChild(text);
+        habitElement.appendChild(habitHeader);
         
-        if (habit.completed) {
+        const weekGrid = document.createElement('div');
+        weekGrid.className = 'week-grid';
+        
+        const today = new Date().toLocaleDateString('he-IL');
+        const completedDays = habit.completedDays[today] || {};
+        
+        weekDays.forEach((day, index) => {
+            const dayCell = document.createElement('div');
+            dayCell.className = `day-cell ${completedDays[index] ? 'completed-day' : ''}`;
+            
+            const dayLabel = document.createElement('div');
+            dayLabel.className = 'day-label';
+            dayLabel.textContent = day;
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'day-checkbox';
+            checkbox.checked = completedDays[index] || false;
+            checkbox.onclick = () => toggleHabitDay(habit.id, index);
+            
+            dayCell.appendChild(dayLabel);
+            dayCell.appendChild(checkbox);
+            weekGrid.appendChild(dayCell);
+        });
+        
+        habitElement.appendChild(weekGrid);
+        
+        // הוספת מילת עידוד אם יש לפחות הרגל אחד שבוצע היום
+        const completedToday = Object.values(completedDays).some(completed => completed);
+        if (completedToday) {
             const encouragement = document.createElement('div');
             encouragement.className = 'encouragement';
             encouragement.textContent = encouragements[Math.floor(Math.random() * encouragements.length)];
